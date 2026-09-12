@@ -1,7 +1,7 @@
 fastapi[all]==0.111.0
 sqlalchemy==2.0.30
 alembic==1.13.1
-psycopg2-binary==2.9.9
+psycopg[binary]
 celery==5.4.0
 redis==5.0.4
 openai==1.30.1
