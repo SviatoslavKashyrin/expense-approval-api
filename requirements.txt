@@ -1,5 +1,5 @@
 fastapi[all]==0.111.0
-sqlalchemy==2.0.30
+sqlalchemy>=2.0.35
 alembic==1.13.1
 psycopg[binary]
 celery==5.4.0
