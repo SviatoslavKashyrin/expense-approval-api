@@ -1,12 +1,20 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/expense_db"
-    OPENAI_API_KEY: str = "your-openai-api-key"
+    PROJECT_NAME: str = "Expense Approval API"
 
-    class Config:
-        env_file = ".env"
+    DATABASE_URL: str
+
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_ignore_empty=True,
+        extra="ignore"
+    )
 
 
 settings = Settings()
