@@ -46,7 +46,7 @@ class ExpenseOut(BaseModel):
 
     id: int
     amount: Decimal
-    category: str
+    category_id: int
     description: str
     expense_date: date
     payment_details: str
