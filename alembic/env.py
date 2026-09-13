@@ -1,10 +1,17 @@
+import os
 import sys
 from pathlib import Path
 from logging.config import fileConfig
 
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
+
+from app.core.database import Base
+from app.models.user import User
+from app.models.expense import Expense
 
 
 sys.path.append(str(Path(__file__).parent.parent))

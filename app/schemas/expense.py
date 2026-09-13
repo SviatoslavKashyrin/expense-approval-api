@@ -21,24 +21,8 @@ class ExpenseCreate(BaseModel):
 
 
 class ExpenseDecision(BaseModel):
-    decision: str = Field(description="'approve' або 'reject'")
-    comment: Optional[str] = Field(default=None, max_length=2000)
-
-    @field_validator("decision")
-    @classmethod
-    def valid_decision(cls, v: str) -> str:
-        v = v.lower().strip()
-        if v not in ("approve", "reject"):
-            raise ValueError("decision має бути 'approve' або 'reject'")
-        return v
-
-    @field_validator("comment")
-    @classmethod
-    def comment_required_for_reject(cls, v, info):
-        decision = info.data.get("decision")
-        if decision == "reject" and (v is None or not v.strip()):
-            raise ValueError("Коментар обов'язковий при відхиленні заявки (reject)")
-        return v
+    decision: str
+    comment: Optional[str] = None
 
 
 class ExpenseOut(BaseModel):
@@ -55,17 +39,13 @@ class ExpenseOut(BaseModel):
     created_at: datetime
     decided_at: Optional[datetime] = None
 
+    ai_status: str | None = None
+    ai_flag: bool | None = None
+    ai_flag_reason: str | None = None
+    ai_summary: str | None = None
+
 
 class ExpenseApproverOut(ExpenseOut):
     employee_id: int
     employee_name: str
     employee_email: str
-    ai_status: str
-    ai_summary: Optional[str] = None
-    ai_flag: Optional[bool] = None
-    ai_flag_reason: Optional[str] = None
-
-
-class ExpenseDecision(BaseModel):
-    decision: str
-    comment: Optional[str] = None

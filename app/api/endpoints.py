@@ -14,6 +14,8 @@ from app.api.deps import get_current_user
 from app.schemas.expense import ExpenseCreate, ExpenseOut, ExpenseDecision
 from app.worker.tasks import analyze_expense_task
 
+from fastapi import WebSocket, WebSocketDisconnect
+from app.services.ws_manager import manager
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -97,7 +99,7 @@ def read_expenses_for_approval(
 
 
 @expense_router.patch("/{expense_id}/review", response_model=ExpenseOut)
-def review_expense_endpoint(
+async def review_expense_endpoint(
         expense_id: int,
         decision_in: ExpenseDecision,
         db: Session = Depends(get_db),
@@ -105,7 +107,6 @@ def review_expense_endpoint(
 ):
     if not current_user.is_approver:
         raise HTTPException(status_code=403, detail="Доступ заборонено")
-
 
     if decision_in.decision == "reject" and not decision_in.comment:
         raise HTTPException(
@@ -124,6 +125,17 @@ def review_expense_endpoint(
     if not updated_expense:
         raise HTTPException(status_code=404, detail="Заявка не знайдена або ти не є її модератором")
 
+
+    await manager.send_personal_message(
+        {
+            "event": "status_update",
+            "expense_id": updated_expense.id,
+            "new_status": updated_expense.status,
+            "decision_comment": updated_expense.rejection_comment
+        },
+        user_id=updated_expense.employee_id
+    )
+
     return updated_expense
 
 
@@ -140,3 +152,13 @@ def withdraw_expense_endpoint(
             detail="Заявка не знайдена або вже оброблена (можна відкликати лише pending)"
         )
     return updated_expense
+
+
+@expense_router.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: int):
+    await manager.connect(websocket, user_id)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, user_id)
