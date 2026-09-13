@@ -86,3 +86,17 @@ def review_expense(db: Session, expense_id: int, approver_id: int, decision: str
     db.commit()
     db.refresh(expense)
     return expense
+
+
+def withdraw_expense(db: Session, expense_id: int, employee_id: int) -> Expense | None:
+    expense = db.execute(
+        select(Expense).where(Expense.id == expense_id, Expense.employee_id == employee_id)
+    ).scalars().first()
+
+    if not expense or expense.status != "pending":
+        return None
+
+    expense.status = "withdrawn"
+    db.commit()
+    db.refresh(expense)
+    return expense

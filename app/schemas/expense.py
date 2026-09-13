@@ -64,3 +64,8 @@ class ExpenseApproverOut(ExpenseOut):
     ai_summary: Optional[str] = None
     ai_flag: Optional[bool] = None
     ai_flag_reason: Optional[str] = None
+
+
+class ExpenseDecision(BaseModel):
+    decision: str
+    comment: Optional[str] = None
