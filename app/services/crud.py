@@ -79,7 +79,8 @@ def review_expense(db: Session, expense_id: int, approver_id: int, decision: str
     if not expense:
         return None
 
-    expense.status = "approved" if decision == "approve" else "rejected"
+
+    expense.status = "approved" if decision == "approved" else "rejected"
     expense.rejection_comment = comment
     expense.decided_at = datetime.now(timezone.utc)
 
