@@ -18,9 +18,9 @@ class User(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
-    expenses_submitted = relationship(
-        "Expense", back_populates="employee", foreign_keys="Expense.employee_id"
+    expenses_submitted: Mapped[list["Expense"]] = relationship(
+        "Expense", back_populates="employee", foreign_keys="[Expense.employee_id]"
     )
-    expenses_to_approve = relationship(
-        "Expense", back_populates="approver", foreign_keys="Expense.approver_id"
+    expenses_to_approve: Mapped[list["Expense"]] = relationship(
+        "Expense", back_populates="approver", foreign_keys="[Expense.approver_id]"
     )
